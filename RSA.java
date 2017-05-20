@@ -25,7 +25,6 @@ public class RSA {
 	public RSA() {
 		createPQ();	//create prime numbers p and q
 		this.n = p*q;	// use p and q to make n
-		System.out.println(p + " " + q);
 		this.theta = (p-1)*(q-1);	// use p and q to make theta
 		findE();	//find an e where 1 < e < theta
 		pulverizer();	// used to find the x and y values
@@ -43,9 +42,8 @@ public class RSA {
 	// makes sure that gcd(theta, e) == 1
 	public void findE() {
 		// for all numbers less than theta
-		System.out.println(theta);
 		for(int i = 3; i < this.theta; i++) {
-			System.out.println(i);
+			//System.out.println(i);
 			// if their gcd is 1 set e = i and break
 			if(gcd(this.theta, i) == 1) {
 				e = i;
@@ -80,23 +78,24 @@ public class RSA {
 			pulv[6] = x1Temp - qTemp*(pulv[4]);
 			pulv[7] = y1Temp - qTemp*(pulv[5]);
 		}
-		if(pulv[6]*this.theta + pulv[7]*this.e == 1)
-			System.out.println("Success");
-		else System.out.println("Fail");
+		this.x = pulv[6];
+		this.y = pulv[7];
 	}
 	
 	//finds as random a number i can think of
 	//returns int
 	private int findPrimeNumber() {
-		Random r = new Random();	//create random object
-		int rand = r.nextInt(400)+1;	// create a random number
+		Random r = new Random(1);	//create random object
+		int rand = r.nextInt(20)+5;	// create a random number
 		int prime = 1;	//keep track of our prime number
 		int primeCount = 3;
 		//from 0 to the temp number divided by a different random
 		for(int i = 1; i < rand; i++){
+			//System.out.println("Am i getting here ?");
 			//if the prime count value is prime then multiply it
-			if(isPrime(primeCount))
+			if(isPrime(primeCount)) {
 				prime *= primeCount;
+			}
 			primeCount++;	//or else just add one to prime count
 		}
 		//return the number plus one, because then it is prime
@@ -109,15 +108,23 @@ public class RSA {
 		if(prime%2 == 0) return false;
 		//looping through odd values until i^2
 		//is greater than the "prime" value
-		for(int i = 3; i <= prime; i++)
-			if(prime%i == 0) return false; //if evenly divisible then return false
-		return true; // else return true that it is prime
+		int i = 3;
+		while(i*i <= prime && prime%i != 0){i+=2;}
+		return prime%i != 0; // else return true that it is prime
 	}
 	
 	// checking for the gcd recursively
 	public int gcd(int t, int i) {
 		if(t == 0 || i == 0) return t+i; //returning an assumed to be >0 value
 		return gcd(i, t%i); //returns gcd(smaller int, bigger int mod smaller)
+	}
+	
+	public int encrypt(int m) {
+		return ((int)Math.pow(m, e))%n;
+	}
+	
+	public int decrypt(int c) {
+		return ((int)Math.pow(c, d))%n;
 	}
 	
 }
@@ -127,5 +134,9 @@ class RSAMain {
 	
 	public static void main(String [] args) {
 		RSA r = new RSA();
+		int m = 2;
+		int c = r.encrypt(2);
+		if(r.decrypt(c) == m) System.out.println("You Rock");
+		else System.out.println("You suck");
 	}
 }
