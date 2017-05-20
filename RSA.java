@@ -25,18 +25,35 @@ public class RSA {
 	//by calling on a series of methods
 	public RSA() {
 		createPQ();
+		this.n = p*q;
+		this.theta = (p-1)*(q-1)
 	}
 	
-	 void createPQ() {
-		p = findPrimeNumber();
+	private void createPQ() {
+		this.p = findPrimeNumber();
+		this.q = findPrimeNumber();
 	}
 	
-	public int findPrimeNumber() {
+	private int findPrimeNumber() {
 		Random r = new Random();
-		int temp = r.nextInt(100) +10;
-		int firstPrime = 3;
-		for(int i = 0; i < temp; i++);
-			
+		int rand = r.nextInt(400)+1;
+		int prime = 1;
+		int temp = (r.nextInt(rand)+rand) + (r.nextInt(rand)+rand);
+		int primeCount = 3;
+		for(int i = 0; i < temp/r.nextInt(rand/4); i++){
+			if(isPrime(primeCount))
+				prime *= primeCount;
+			primeCount++;
+		}
+		return prime++;
+	}
+	
+	public boolean isPrime(int prime) {
+		if(n%2 == 0) return false;
+		//looping through odd values
+		for(int i = 3; i*i <= prime; i +=2)
+			if(n%i == 0) return false;
+		return true;
 	}
 	
 }
