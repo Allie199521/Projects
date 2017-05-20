@@ -29,6 +29,7 @@ public class RSA {
 		findE();	//find an e where 1 < e < theta
 		pulverizer();	// used to find the x and y values
 		this.d = y%theta;
+		System.out.println(d);
 	}
 	
 	// sets the p and q value to a prime number
@@ -78,6 +79,8 @@ public class RSA {
 			pulv[6] = x1Temp - qTemp*(pulv[4]);
 			pulv[7] = y1Temp - qTemp*(pulv[5]);
 		}
+		if(pulv[6]*this.theta + pulv[7]*this.e == 1) System.out.println("Success");
+		else System.out.println("failure");
 		this.x = pulv[6];
 		this.y = pulv[7];
 	}
@@ -136,6 +139,7 @@ class RSAMain {
 		RSA r = new RSA();
 		int m = 2;
 		int c = r.encrypt(2);
+		System.out.println(c + " " + r.decrypt(c));
 		if(r.decrypt(c) == m) System.out.println("You Rock");
 		else System.out.println("You suck");
 	}
