@@ -11,14 +11,14 @@ import java.util.*;
 import java.io.*;
 
 public class RSA {
-	public int n;	// n value for both public and private keys
-	public int e;	// e value for the public key
-	private int d;	// d value for the private key
-	private int p;	// p prime number
-	private int q;	// q prime number
-	private int theta;	//(p-1)*(q-1)
-	private int x;	// 1 = x * e + y * theta
-	private int y;	
+	public long n;	// n value for both public and private keys
+	public long e;	// e value for the public key
+	private long d;	// d value for the private key
+	private long p;	// p prime number
+	private long q;	// q prime number
+	private long theta;	//(p-1)*(q-1)
+	private long x;	// 1 = x * e + y * theta
+	private long y;	
 	
 	//implements the public and private keys
 	//by calling on a series of methods
@@ -26,9 +26,11 @@ public class RSA {
 		createPQ();	//create prime numbers p and q
 		this.n = p*q;	// use p and q to make n
 		this.theta = (p-1)*(q-1);	// use p and q to make theta
-		findE();	//find an e where 1 < e < theta
-		pulverizer();	// used to find the x and y values
-		this.d = y%theta;
+		findE();	//find an e where 1 < e < theta 
+		long[] pulv = pulverizer(theta, e);	// used to find the x and y values
+		this.x = pulv[6];
+		this.y = pulv[7];
+		this.d = Math.abs((long)Math.pow(e, -1)%theta);
 		System.out.println(d);
 	}
 	
@@ -56,10 +58,10 @@ public class RSA {
 	
 	// finds our x and y values by using the
 	// pulverizer algorithm
-	public void pulverizer() {
-		int [] pulv = new int[8];
-		pulv[0] = this.theta;	//temp theta value
-		pulv[1] = this.e;	// temp e value
+	public long[] pulverizer(long i, long j) {
+		long [] pulv = new long[8];
+		pulv[0] = i;	//temp theta value
+		pulv[1] = j;	// temp e value
 		pulv[2] = pulv[0]/pulv[1];	// quotient
 		pulv[3] = pulv[0]%pulv[1];	// remainder
 		pulv[4] = 1;	// x1
@@ -69,29 +71,26 @@ public class RSA {
 		while (pulv[3] != 0) {
 			pulv[0] = pulv[1];
 			pulv[1] = pulv[3];
-			int qTemp = pulv[2];
+			long qTemp = pulv[2];
 			pulv[2] = pulv[0]/pulv[1];
 			pulv[3] = pulv[0]%pulv[1];
-			int x1Temp = pulv[4];
-			int y1Temp = pulv[5];
+			long x1Temp = pulv[4];
+			long y1Temp = pulv[5];
 			pulv[4] = pulv[6];	// x1
 			pulv[5] = pulv[7];	// y1
 			pulv[6] = x1Temp - qTemp*(pulv[4]);
 			pulv[7] = y1Temp - qTemp*(pulv[5]);
 		}
-		if(pulv[6]*this.theta + pulv[7]*this.e == 1) System.out.println("Success");
-		else System.out.println("failure");
-		this.x = pulv[6];
-		this.y = pulv[7];
+		return pulv;
 	}
 	
 	//finds as random a number i can think of
 	//returns int
-	private int findPrimeNumber() {
+	private long findPrimeNumber() {
 		Random r = new Random(1);	//create random object
 		int rand = r.nextInt(20)+5;	// create a random number
-		int prime = 1;	//keep track of our prime number
-		int primeCount = 3;
+		long prime = 1;	//keep track of our prime number
+		long primeCount = 3;
 		//from 0 to the temp number divided by a different random
 		for(int i = 1; i < rand; i++){
 			//System.out.println("Am i getting here ?");
@@ -107,27 +106,29 @@ public class RSA {
 	
 	// method to check if something is prime
 	//takes a prime value and returns a boolean
-	public boolean isPrime(int prime) {
+	public boolean isPrime(long prime) {
 		if(prime%2 == 0) return false;
 		//looping through odd values until i^2
 		//is greater than the "prime" value
-		int i = 3;
+		long i = 3;
 		while(i*i <= prime && prime%i != 0){i+=2;}
 		return prime%i != 0; // else return true that it is prime
 	}
 	
 	// checking for the gcd recursively
-	public int gcd(int t, int i) {
+	public long gcd(long t, long i) {
 		if(t == 0 || i == 0) return t+i; //returning an assumed to be >0 value
 		return gcd(i, t%i); //returns gcd(smaller int, bigger int mod smaller)
 	}
 	
-	public int encrypt(int m) {
-		return ((int)Math.pow(m, e))%n;
+	public long encrypt(long m) {
+		return ((long)Math.pow(m, e))%n;
 	}
 	
-	public int decrypt(int c) {
-		return ((int)Math.pow(c, d))%n;
+	public long decrypt(long c) {
+		System.out.println(c + " " + d + " " + (long)Math.pow(c, d));
+		System.out.println(n + " " + ((long)Math.pow(c, d))%n);
+		return ((long)Math.pow(c, d))%n;
 	}
 	
 }
@@ -137,8 +138,8 @@ class RSAMain {
 	
 	public static void main(String [] args) {
 		RSA r = new RSA();
-		int m = 2;
-		int c = r.encrypt(2);
+		long m = 2;
+		long c = r.encrypt(2);
 		System.out.println(c + " " + r.decrypt(c));
 		if(r.decrypt(c) == m) System.out.println("You Rock");
 		else System.out.println("You suck");
