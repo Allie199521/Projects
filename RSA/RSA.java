@@ -8,7 +8,6 @@
 // to send to a private key, (n, d) to decrypt the encrypted message
 
 import java.util.*;
-import java.io.*;
 
 public class RSA {
 	public long n;	// n value for both public and private keys
